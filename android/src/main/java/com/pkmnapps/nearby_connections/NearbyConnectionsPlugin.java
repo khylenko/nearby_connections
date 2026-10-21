@@ -225,7 +225,9 @@ public class NearbyConnectionsPlugin implements MethodCallHandler, FlutterPlugin
 
 				assert endpointId != null;
 				assert bytes != null;
-				Nearby.getConnectionsClient(activity).sendPayload(endpointId, Payload.fromBytes(bytes));
+				Nearby.getConnectionsClient(activity).sendPayload(endpointId, Payload.fromBytes(bytes))
+                .addOnSuccessListener(v -> result.success(true))
+                .addOnFailureListener(e -> result.error("Failure", e.getMessage(), null));
 				Log.d("nearby_connections", "sentPayload");
 				result.success(true);
 				break;
