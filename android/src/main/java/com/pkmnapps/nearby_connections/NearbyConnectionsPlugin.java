@@ -220,41 +220,40 @@ public class NearbyConnectionsPlugin implements MethodCallHandler, FlutterPlugin
 				break;
 			}
 			case "sendPayload": {
-				String endpointId = (String) call.argument("endpointId");
-				byte[] bytes = call.argument("bytes");
+                String endpointId = (String) call.argument("endpointId");
+                byte[] bytes = call.argument("bytes");
 
-				assert endpointId != null;
-				assert bytes != null;
-				Nearby.getConnectionsClient(activity).sendPayload(endpointId, Payload.fromBytes(bytes))
-                .addOnSuccessListener(v -> result.success(true))
-                .addOnFailureListener(e -> result.error("Failure", e.getMessage(), null));
-				Log.d("nearby_connections", "sentPayload");
-				result.success(true);
-				break;
-			}
-			case "sendFilePayload": {
-				String endpointId = (String) call.argument("endpointId");
-				String filePath = (String) call.argument("filePath");
-
-				assert endpointId != null;
-				assert filePath != null;
-
-				try {
-					File file = new File(filePath);
-
-					Payload filePayload = Payload.fromFile(file);
-					Nearby.getConnectionsClient(activity).sendPayload(endpointId, filePayload)
+                assert endpointId != null;
+                assert bytes != null;
+                Nearby.getConnectionsClient(activity).sendPayload(endpointId, Payload.fromBytes(bytes))
                     .addOnSuccessListener(v -> result.success(true))
                     .addOnFailureListener(e -> result.error("Failure", e.getMessage(), null));
-					Log.d("nearby_connections", "sentFilePayload");
-					result.success(filePayload.getId()); // return payload id to dart
-				} catch (FileNotFoundException e) {
-					Log.e("nearby_connections", "File not found", e);
-					result.error("Failure", e.getMessage(), null);
-					return;
-				}
-				break;
-			}
+                Log.d("nearby_connections", "sentPayload");
+                break;
+            }
+            case "sendFilePayload": {
+                String endpointId = (String) call.argument("endpointId");
+                String filePath = (String) call.argument("filePath");
+
+                assert endpointId != null;
+                assert filePath != null;
+
+                try {
+                    File file = new File(filePath);
+
+                    Payload filePayload = Payload.fromFile(file);
+                    Nearby.getConnectionsClient(activity).sendPayload(endpointId, filePayload)
+                        .addOnSuccessListener(v -> result.success(filePayload.getId())) // Dart expects the payload id
+                        .addOnFailureListener(e -> result.error("Failure", e.getMessage(), null));
+                    Log.d("nearby_connections", "sentFilePayload");
+                } catch (FileNotFoundException e) {
+                    Log.e("nearby_connections", "File not found", e);
+                    result.error("Failure", e.getMessage(), null);
+                    return;
+                }
+                break;
+            }
+
 			case "cancelPayload": {
 				String payloadId = (String) call.argument("payloadId");
 				assert payloadId != null;
