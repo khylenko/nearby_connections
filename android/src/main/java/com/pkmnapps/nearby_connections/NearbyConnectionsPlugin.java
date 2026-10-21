@@ -243,7 +243,9 @@ public class NearbyConnectionsPlugin implements MethodCallHandler, FlutterPlugin
 					File file = new File(filePath);
 
 					Payload filePayload = Payload.fromFile(file);
-					Nearby.getConnectionsClient(activity).sendPayload(endpointId, filePayload);
+					Nearby.getConnectionsClient(activity).sendPayload(endpointId, filePayload)
+                    .addOnSuccessListener(v -> result.success(true))
+                    .addOnFailureListener(e -> result.error("Failure", e.getMessage(), null));
 					Log.d("nearby_connections", "sentFilePayload");
 					result.success(filePayload.getId()); // return payload id to dart
 				} catch (FileNotFoundException e) {
